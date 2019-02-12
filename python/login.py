@@ -11,21 +11,13 @@ def index():
         <head>
             <title>CB-Connexion</title>
             <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1">
-        <!--===============================================================================================-->	
+            <!--===============================================================================================-->	
             <link rel="icon" type="image/png" href="'''+chemin+'''/login/images/icons/favicon.ico"/>
         <!--===============================================================================================-->
             <link rel="stylesheet" type="text/css" href="'''+chemin+'''/login/vendor/bootstrap/css/bootstrap.min.css">
         <!--===============================================================================================-->
             <link rel="stylesheet" type="text/css" href="'''+chemin+'''/login/fonts/font-awesome-4.7.0/css/font-awesome.min.css">
         <!--===============================================================================================-->
-            <link rel="stylesheet" type="text/css" href="'''+chemin+'''/login/vendor/animate/animate.css">
-        <!--===============================================================================================-->	
-            <link rel="stylesheet" type="text/css" href="'''+chemin+'''/login/vendor/css-hamburgers/hamburgers.min.css">
-        <!--===============================================================================================-->
-            <link rel="stylesheet" type="text/css" href="'''+chemin+'''/login/vendor/select2/select2.min.css">
-        <!--===============================================================================================-->
-            <link rel="stylesheet" type="text/css" href="'''+chemin+'''/login/css/util.css">
             <link rel="stylesheet" type="text/css" href="'''+chemin+'''/login/css/main.css">
         <!--===============================================================================================-->
         </head>
@@ -84,17 +76,12 @@ def index():
                     </div>
                 </div>
             </div>
-            
-            
-        
-            
+                
         <!--===============================================================================================-->	
             <script src="'''+chemin+'''/login/vendor/jquery/jquery-3.2.1.min.js"></script>
         <!--===============================================================================================-->
             <script src="'''+chemin+'''/login/vendor/bootstrap/js/popper.js"></script>
             <script src="'''+chemin+'''/login/vendor/bootstrap/js/bootstrap.min.js"></script>
-        <!--===============================================================================================-->
-            <script src="'''+chemin+'''/login/vendor/select2/select2.min.js"></script>
         <!--===============================================================================================-->
             <script src="'''+chemin+'''/login/vendor/tilt/tilt.jquery.min.js"></script>
             <script >
@@ -119,8 +106,33 @@ def verif(login='',pwd=''):
     else:
         raise HTTP_REDIRECTION(chemin + '/python/login.py')
 
+def verif(login='',pwd=''):
+    resultat = bdd.verif_connect(login, pwd)
+    resultat_admin = bdd.verif_connect_admin(login, pwd)
+    cookies.set_cookie("login", login)
+    if resultat_admin:
+        cookies.set_cookie("idMembre", resultat_admin[0])
+        cookies.set_cookie("nom", resultat_admin[1])
+        cookies.set_cookie("prenom", resultat_admin[2])
+        cookies.set_cookie("admin", 1)
+
+        raise HTTP_REDIRECTION(chemin + '/index.py')
+    elif resultat:
+        cookies.set_cookie("idMembre", resultat[0])
+        cookies.set_cookie("nom", resultat[1].decode("utf-8"))
+        cookies.set_cookie("prenom", resultat[2].decode("utf-8"))
+        cookies.set_cookie("admin", 0)
+        cookies.set_cookie("idEquipe", resultat[3])
+        cookies.set_cookie("mode", 0)
+        raise HTTP_REDIRECTION(chemin + '/index.py')
+    else:
+        raise HTTP_REDIRECTION(chemin + '/python/login.py')
+
 def deconnecter():
     if "nom" in COOKIE:
+        cookies.erase("idMembre")
         cookies.erase("nom")
         cookies.erase("prenom")
         cookies.erase("login")
+        cookies.erase("admin")
+        cookies.erase("idEquipe")

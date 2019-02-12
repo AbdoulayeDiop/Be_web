@@ -1,22 +1,34 @@
 template = Import('python/template.py')
-google_map = Import('python/google_map.py')
+bdd = Import('data/bdd.py')
+google_map = Import('python/google_map2.py')
+classement = Import('python/classement.py')
 conf = Import('data/config.py')
 chemin = conf.chemin()
 
 
 def index():
     if "nom" in COOKIE:
-        result = template.entete(chemin)
-        result += template.main_header(chemin)
-        result += template.sidebar(1, chemin)
-        result += main_panel()
-        result += template.footer(chemin)
-        return result
+        if COOKIE["admin"].value == '0':
+            result = template.entete(chemin,'CB-Accueil')
+            result += template.main_header(chemin)
+            result += template.sidebar(1, chemin)
+            result += main_panel()
+            result += template.footer(chemin)
+            return result
+        else:
+            raise HTTP_REDIRECTION(chemin + '/python/ajouter_equipe.py')
     else:
         raise HTTP_REDIRECTION(chemin + '/python/login.py')
 
 
 def map_view():
+    d = classement.calcul_classement()
+    best_score = d[0][1]
+    rang = 1
+    for i, val in enumerate(d):
+        if val[0] == bdd.get_idAvion(COOKIE["idEquipe"].value):
+            rang += i
+
     vmap_view = '''
     <div class="row">
         <div class="col-md-3">
@@ -31,7 +43,7 @@ def map_view():
                         <div class="col-7 d-flex align-items-center">
                             <div class="numbers">
                                 <p class="card-category"> Equipes</p>
-                                <h4 class="card-title">17</h4>
+                                <h4 class="card-title">'''+str(bdd.count_equipes()[0])+'''</h4>
                             </div>
                         </div>
                     </div>
@@ -50,7 +62,7 @@ def map_view():
                         <div class="col-7 d-flex align-items-center">
                             <div class="numbers">
                                 <p class="card-category">Rang</p>
-                                <h4 class="card-title">6 ème</h4>
+                                <h4 class="card-title">'''+str(rang)+'''</h4>
                             </div>
                         </div>
                     </div>
@@ -69,7 +81,7 @@ def map_view():
                         <div class="col-7 d-flex align-items-center">
                             <div class="numbers">
                                 <p class="card-category">Meilleurs score</p>
-                                <h4 class="card-title">32</h4>
+                                <h4 class="card-title">'''+str(best_score)+'''</h4>
                             </div>
                         </div>
                     </div>
@@ -87,8 +99,14 @@ def map_view():
                         </div>
                         <div class="col-7 d-flex align-items-center">
                             <div class="numbers">
-                                <p class="card-category">Temps restant</p>
-                                <h4 class="card-title">18:09:11</h4>
+                                <p class="card-category">Temps courrant</p>
+                                <h4 id = "time_shower" class="card-title"></h4>
+                                <script>
+                                    setInterval( function(){
+                                        var d = new Date();
+                                        document.getElementById("time_shower").innerHTML = d.toLocaleTimeString();
+                                    });
+                                    </script>
                             </div>
                         </div>
                     </div>
@@ -119,7 +137,7 @@ def info_bar():
                         <h4><b>Distance parcourue<i class="la la-map-pin"></i></b></h4>
                     </div> 
                     <div class="card-footer text-primary">
-                        </br><h2><b> 2000 Nm</b></h4>
+                        </br><h2><b id = "distance_shower"></b></h4>
                     </div>
                 </div>
             </div>
@@ -141,7 +159,7 @@ def info_bar():
                             <div class="col-7 d-flex align-items-center">
                                 <div class="numbers">
                                     <p class="card-category">à visiter</p>
-                                    <h4 class="card-title">5,6</h4>
+                                    <h4 id= "a_visiter" class="card-title"></h4>
                                 </div>
                             </div>
                         </div>
@@ -155,7 +173,7 @@ def info_bar():
                             <div class="col-7 d-flex align-items-center">
                                 <div class="numbers">
                                     <p class="card-category">visitée(s)</p>
-                                    <h4 class="card-title">1,2,3,4</h4>
+                                    <h4 id= "visite" class="card-title"></h4>
                                 </div>
                             </div>
                         </div>

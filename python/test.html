@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+<script>
+//set the variables.
+function getArticle(id) {
+    var link = "/bouamrene_diop_lecalvez_ranem/python/ggg.py/fo";
+    xmlhttpPost(link, id);
+}
+
+//Make the actual connection.
+function xmlhttpPost(strURL, id) {
+    var xmlHttpReq = false;
+    var self = this;
+    self.name = 'aa'
+    // Mozilla/Safari
+    if (window.XMLHttpRequest) {
+        self.xmlHttpReq = new XMLHttpRequest();
+    }
+    // IE
+    else if (window.ActiveXObject) {
+        self.xmlHttpReq = new ActiveXObject("Microsoft.XMLHTTP");
+    }
+    self.xmlHttpReq.open('POST', strURL, true);
+    self.xmlHttpReq.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    self.xmlHttpReq.onreadystatechange = function() {
+        if (self.xmlHttpReq.readyState == 4) { //ready state 4 means its complete.
+            updatepage(self.xmlHttpReq.responseText);
+        }
+    }
+    self.xmlHttpReq.send('aa=' +id);
+}
+
+//set the query string to be sent
+function getquerystring(id) {
+    qstr = 'data=' + id  // NOTE: no '?' before querystring
+    return qstr;
+}
+
+//put the data on the page.
+function updatepage(str) {
+    document.getElementById("data").innerHTML = str;
+}
+</script>
+<select name = 'jj' onchange="getArticle('2');">
+<option value="1">Train hits car</option>
+<option value="2">Airplane Crashes</option>
+<option value="3">Mental Health</option>
+</select>
+<div id="data"></div>
+</body>
+</html>

@@ -1,4 +1,4 @@
-conf=Import('../data/config.py')
+conf=Import('/bouamrene_diop_lecalvez_ranem/data/config.py')
 chemin=conf.chemin()
 
 def index(**kw):
